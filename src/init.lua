@@ -159,7 +159,7 @@ end
 
 local function pushi3(cursor, x)
 	buffer.writeu8(cursor.Buf, cursor.Pos, x)
-	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x / 256)
+	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x // 256)
 	cursor.Pos += 3
 end
 
@@ -183,7 +183,7 @@ end
 
 local function pushi5(cursor: Cursor, x: number)
 	buffer.writeu8(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 1, x / 256)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 1, x // 256)
 	cursor.Pos += 5
 end
 
@@ -197,7 +197,7 @@ end
 
 local function pushi6(cursor: Cursor, x: number)
 	buffer.writeu16(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 2, x / 256 ^ 2)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 2, x // 256 ^ 2)
 	cursor.Pos += 6
 end
 
@@ -211,8 +211,8 @@ end
 
 local function pushi7(cursor: Cursor, x: number)
 	buffer.writeu8(cursor.Buf, cursor.Pos, x)
-	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x / 256)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 3, x / 256 ^ 3)
+	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x // 256)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 3, x // 256 ^ 3)
 	cursor.Pos += 7
 end
 
@@ -227,7 +227,7 @@ end
 
 local function pushi8(cursor: Cursor, x: number)
 	buffer.writeu32(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 4, x / 256 ^ 4)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 4, x // 256 ^ 4)
 	cursor.Pos += 8
 end
 
