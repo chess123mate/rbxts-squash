@@ -158,18 +158,17 @@ local function popi2(cursor: Cursor)
 end
 
 local function pushi3(cursor, x)
-	local x = if x >= 0 then x * 2 else -x * 2 - 1
-	buffer.writeu8(cursor.Buf, cursor.Pos, x % 256)
-	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x // 256)
+	buffer.writeu8(cursor.Buf, cursor.Pos, x)
+	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x / 256)
 	cursor.Pos += 3
 end
 
 local function popi3(cursor)
 	cursor.Pos -= 3
-	local x1 = buffer.readu8 (cursor.Buf, cursor.Pos    )
+	local x1 = buffer.readu8(cursor.Buf, cursor.Pos)
 	local x2 = buffer.readu16(cursor.Buf, cursor.Pos + 1)
 	local x = x1 + x2 * 256
-	return if x % 2 == 0 then x // 2 else -( (x + 1) // 2 )
+	return if x >= 2 ^ 23 then x - 2 ^ 24 else x
 end
 
 local function pushi4(cursor: Cursor, x: number)
@@ -183,9 +182,8 @@ local function popi4(cursor: Cursor)
 end
 
 local function pushi5(cursor: Cursor, x: number)
-	local x = if x >= 0 then x * 2 else -x * 2 - 1
 	buffer.writeu8(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 1, x // 256)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 1, x / 256)
 	cursor.Pos += 5
 end
 
@@ -194,13 +192,12 @@ local function popi5(cursor: Cursor)
 	local x1 = buffer.readu8(cursor.Buf, cursor.Pos)
 	local x2 = buffer.readu32(cursor.Buf, cursor.Pos + 1)
 	local x = x1 + x2 * 256
-	return if x % 2 == 0 then x // 2 else -( (x + 1) // 2 )
+	return if x >= 2 ^ 39 then x - 2 ^ 40 else x
 end
 
 local function pushi6(cursor: Cursor, x: number)
-	local x = if x >= 0 then x * 2 else -x * 2 - 1
 	buffer.writeu16(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 2, x // 256 ^ 2)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 2, x / 256 ^ 2)
 	cursor.Pos += 6
 end
 
@@ -209,39 +206,37 @@ local function popi6(cursor: Cursor)
 	local x1 = buffer.readu16(cursor.Buf, cursor.Pos)
 	local x2 = buffer.readu32(cursor.Buf, cursor.Pos + 2)
 	local x = x1 + x2 * 256 ^ 2
-	return if x % 2 == 0 then x // 2 else -( (x + 1) // 2 )
+	return if x >= 2 ^ 47 then x - 2 ^ 48 else x
 end
 
 local function pushi7(cursor: Cursor, x: number)
-	local x = if x >= 0 then x * 2 else -x * 2 - 1
 	buffer.writeu8(cursor.Buf, cursor.Pos, x)
-	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x // 256)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 3, x // 256 ^ 3)
+	buffer.writeu16(cursor.Buf, cursor.Pos + 1, x / 256)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 3, x / 256 ^ 3)
 	cursor.Pos += 7
 end
 
 local function popi7(cursor: Cursor)
 	cursor.Pos -= 7
 	local x1 = buffer.readu8(cursor.Buf, cursor.Pos)
-	local x2 = buffer.readu16(cursor.Buf, cursor.Pos + 1)
-	local x3 = buffer.readu32(cursor.Buf, cursor.Pos + 3)
-	local x = x1 + x2 * 256 + x3 * 256 ^ 3
-	return if x % 2 == 0 then x // 2 else -( (x + 1) // 2 )
+	local x2 = buffer.readu16(cursor.Buf, cursor.Pos + 1) * 256 + x1
+	local x3 = buffer.readu32(cursor.Buf, cursor.Pos + 3) * 256 ^ 3
+	local x = x2 + x3
+	return if x >= 2 ^ 55 then x3 - 2 ^ 56 + x2 else x -- subtract before adding x2 to avoid some precision loss in negative numbers
 end
 
 local function pushi8(cursor: Cursor, x: number)
-	local x = if x >= 0 then x * 2 else -x * 2 - 1
 	buffer.writeu32(cursor.Buf, cursor.Pos, x)
-	buffer.writeu32(cursor.Buf, cursor.Pos + 4, x // 256 ^ 4)
+	buffer.writeu32(cursor.Buf, cursor.Pos + 4, x / 256 ^ 4)
 	cursor.Pos += 8
 end
 
 local function popi8(cursor: Cursor)
 	cursor.Pos -= 8
 	local x1 = buffer.readu32(cursor.Buf, cursor.Pos)
-	local x2 = buffer.readu32(cursor.Buf, cursor.Pos + 4)
-	local x = x1 + x2 * 256 ^ 4
-	return if x % 2 == 0 then x // 2 else -( (x + 1) // 2 )
+	local x2 = buffer.readu32(cursor.Buf, cursor.Pos + 4) * 256 ^ 4
+	local x = x1 + x2
+	return if x >= 2 ^ 63 then x2 - 2 ^ 64 + x1 else x -- subtract before adding x1 to avoid some precision loss in negative numbers
 end
 
 local function pushf4(cursor: Cursor, x: number)
